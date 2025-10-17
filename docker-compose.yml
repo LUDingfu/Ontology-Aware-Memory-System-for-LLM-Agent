@@ -1,0 +1,54 @@
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: always
+    volumes:
+      # Persists your database data across container restarts
+      - app-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-memory_system}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changethis}
+    ports:
+      - "5432:5432"
+
+  prestart:
+    # This service runs your migrations and seeds the database before the main API starts
+    build:
+      context: ./backend
+    depends_on:
+      - db
+    command: bash /app/scripts/prestart.sh # Path inside the container
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_SERVER=db
+
+  api:
+    build:
+      context: ./backend
+    restart: always
+    ports:
+      # Exposes the API on port 8000 on your host machine, forwarding to port 80 in the container
+      - "8000:80"
+    depends_on:
+      - db
+      - prestart
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_SERVER=db
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+
+volumes:
+  app-db-data:

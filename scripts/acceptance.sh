@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Acceptance test script for Ontology-Aware Memory System
-# This script runs after docker-compose up to verify the system works correctly
-
-# Remove set -e to allow tests to continue even if one fails
-# set -e
-
-echo "🧪 Running acceptance tests for Ontology-Aware Memory System..."
 
 # Configuration
 API_BASE_URL="http://localhost:8000"

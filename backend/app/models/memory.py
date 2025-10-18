@@ -66,6 +66,14 @@ class MemorySummary(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
+class MemoryRetrievalResult(SQLModel):
+    """Result of memory retrieval."""
+    memory_id: int
+    text: str
+    similarity: float
+    kind: str
+
+
 # Pydantic models for API requests/responses
 class ChatRequest(SQLModel):
     """Request model for chat endpoint."""
@@ -80,6 +88,8 @@ class ChatResponse(SQLModel):
     used_memories: List[Dict[str, Any]] = Field(default_factory=list)
     used_domain_facts: List[Dict[str, Any]] = Field(default_factory=list)
     session_id: UUID
+    disambiguation_needed: bool = Field(default=False)
+    candidate_entities: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class MemoryRequest(SQLModel):
